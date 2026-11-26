@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Simulasi Teori Atom — Mobile-Friendly Lab, Spektrum, Diagram n &amp; Kuis</title>
+  <title>Simulasi Teori Atom — Mobile Lab, Spektrum, Diagram n &amp; Kuis</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -70,7 +70,7 @@
         </div>
 
         <!-- Quiz Toggle Button -->
-        <button id="quizToggleBtn"
+        <button id="quizToggleBtn" type="button"
           class="min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 shrink-0 bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-[0.98] text-emerald-200 border-emerald-400/45 shadow-md">
           <span>🎯</span>
           <span id="quizToggleText">Kuis</span>
@@ -102,7 +102,7 @@
           </div>
         </div>
 
-        <!-- Quick View Switcher (Especially handy on mobile screens) -->
+        <!-- Quick View Switcher (Mobile < 1024px) -->
         <div class="grid grid-cols-3 lg:hidden rounded-xl bg-slate-950 p-1 border border-slate-800 text-[11px] font-semibold">
           <button type="button" data-view="lab" class="view-tab py-1.5 rounded-lg transition bg-sky-500/25 text-sky-200 border border-sky-400/40">
             Atom &amp; Spektrum
@@ -123,7 +123,6 @@
 
     <!-- Left Column: Atom Canvas + Spectrum + Controls -->
     <section id="labSection" class="lg:col-span-7 flex flex-col rounded-2xl bg-panel border border-slate-800 overflow-hidden shadow-2xl">
-      <!-- Top Action Strip -->
       <div class="px-3 sm:px-4 py-2.5 bg-slate-900/75 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
         <div class="flex items-center justify-between sm:justify-start gap-2">
           <span id="activeBadge" class="px-2.5 py-1 rounded-lg font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
@@ -167,7 +166,7 @@
         </div>
       </div>
 
-      <!-- Orbital Selector Bar (Mobile-friendly grid) -->
+      <!-- Orbital Selector Bar -->
       <div id="orbitalBar" class="hidden px-3 sm:px-4 py-2.5 bg-indigo-950/35 border-b border-indigo-500/20 text-xs">
         <div class="text-indigo-200 font-medium mb-1.5 flex items-center gap-1.5">
           <span>◈</span>
@@ -267,11 +266,11 @@
       </div>
     </section>
 
-    <!-- Right Column: Quiz + Energy Diagram (n) + Theory Info -->
+    <!-- Right Column: Quiz First + Energy Diagram (n) + Theory Info -->
     <aside id="sidePanel" class="lg:col-span-5 flex flex-col gap-3 sm:gap-4">
 
-      <!-- Interactive Quiz Card -->
-      <div id="quizCard" class="hidden rounded-2xl bg-gradient-to-b from-emerald-950/35 to-panel border border-emerald-500/35 p-3.5 sm:p-4 shadow-xl">
+      <!-- Interactive Quiz Card (Placed First Inside Side Panel) -->
+      <div id="quizCard" class="order-first hidden rounded-2xl bg-gradient-to-b from-emerald-950/45 to-panel border-2 border-emerald-400/50 p-3.5 sm:p-4 shadow-xl">
         <div class="flex items-center justify-between gap-2 mb-2">
           <span id="quizCategoryBadge" class="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
             Kuis Teori Atom
@@ -751,7 +750,7 @@
     let energyView = { w: 340, h: 185 };
 
     let state = {
-      mobileView: 'lab', // 'lab' | 'panel' | 'all'
+      mobileView: 'lab',
       theory: 'bohr',
       orbital: 's',
       atomicNumber: 1,
@@ -1078,7 +1077,9 @@
 
       document.querySelectorAll('.orb-btn').forEach((b) => {
         const active = b.dataset.orb === state.orbital;
-        const baseCls = b.dataset.orb === 'dz2' ? 'orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition col-span-2 sm:col-span-1' : 'orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition';
+        const baseCls = b.dataset.orb === 'dz2'
+          ? 'orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition col-span-2 sm:col-span-1'
+          : 'orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition';
         b.className = active
           ? `${baseCls} bg-purple-500/25 text-purple-200 border-purple-400/50`
           : `${baseCls} bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40`;
@@ -1095,7 +1096,6 @@
       drawEnergyDiagram();
     }
 
-    // Quiz Engine
     function loadQuizQuestion(idx) {
       const q = QUIZ_BANK[idx % QUIZ_BANK.length];
       state.quizIndex = idx % QUIZ_BANK.length;
@@ -1155,13 +1155,21 @@
       state.quizActive = !state.quizActive;
       quizCard.classList.toggle('hidden', !state.quizActive);
       quizToggleText.textContent = state.quizActive ? 'Tutup' : 'Kuis';
+
       if (state.quizActive) {
         if (window.innerWidth < 1024) {
-          state.mobileView = 'all';
+          state.mobileView = 'panel';
           applyMobileView();
         }
         loadQuizQuestion(state.quizIndex);
+        requestAnimationFrame(() => {
+          quizCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
       } else {
+        if (window.innerWidth < 1024) {
+          state.mobileView = 'lab';
+          applyMobileView();
+        }
         showToast('Mode Kuis ditutup');
       }
     });
