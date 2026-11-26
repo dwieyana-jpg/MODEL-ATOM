@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Simulasi Teori Atom — Mobile-Friendly Lab, Spektrum, Diagram n &amp; Kuis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#070b14',
+            panel: '#0e1626',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html, body {
+      background-color: #070b14;
+      color: #e2e8f0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    button, select, input[type="range"] {
+      touch-action: manipulation;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070b14; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-sky-500/30 selection:text-sky-200">
+
+  <!-- Top Bar -->
+  <header class="border-b border-slate-800/90 bg-panel/95 backdrop-blur-md sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-gradient-to-br from-sky-400 via-indigo-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="2.2" fill="currentColor" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(90 12 12)" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white flex items-center gap-1.5 truncate">
+              <span>Simulasi Teori Atom</span>
+              <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shrink-0">
+                Mobile Lab
+              </span>
+            </h1>
+            <p class="text-xs text-slate-400 hidden md:block">
+              Model atom, hamburan α, orbital s/p/d, spektrum emisi/absorpsi, diagram tingkat energi (n) &amp; kuis
+            </p>
+          </div>
+        </div>
+
+        <!-- Quiz Toggle Button -->
+        <button id="quizToggleBtn"
+          class="min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 shrink-0 bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-[0.98] text-emerald-200 border-emerald-400/45 shadow-md">
+          <span>🎯</span>
+          <span id="quizToggleText">Kuis</span>
+        </button>
+      </div>
+
+      <!-- Theory Dropdown + Mobile Quick View Tabs -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+          <label for="theorySelect" class="text-xs font-medium text-slate-300 flex items-center gap-1.5 shrink-0">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+            Teori:
+          </label>
+          <div class="relative flex-1 sm:max-w-sm min-w-0">
+            <select id="theorySelect"
+              class="w-full min-h-[38px] appearance-none bg-slate-900 hover:bg-slate-800/90 text-white text-xs sm:text-sm font-medium border border-sky-500/40 focus:border-sky-400 focus:ring-2 focus:ring-sky-500/30 rounded-xl pl-3 pr-8 py-1.5 outline-none transition cursor-pointer truncate">
+              <option value="dalton">1. Dalton (1803) — Bola Pejal</option>
+              <option value="thomson">2. Thomson (1897) — Roti Kismis</option>
+              <option value="rutherford">3. Rutherford (1911) — Tata Surya</option>
+              <option value="alpha_scattering">3b. Rutherford (1911) — Hamburan Sinar α</option>
+              <option value="bohr" selected>4. Bohr (1913) — Kulit Stasioner &amp; n</option>
+              <option value="quantum">5. Mekanika Kuantum (1926) — Orbital s, p, d</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-sky-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick View Switcher (Especially handy on mobile screens) -->
+        <div class="grid grid-cols-3 lg:hidden rounded-xl bg-slate-950 p-1 border border-slate-800 text-[11px] font-semibold">
+          <button type="button" data-view="lab" class="view-tab py-1.5 rounded-lg transition bg-sky-500/25 text-sky-200 border border-sky-400/40">
+            Atom &amp; Spektrum
+          </button>
+          <button type="button" data-view="panel" class="view-tab py-1.5 rounded-lg transition text-slate-400 hover:text-slate-200">
+            Diagram n &amp; Kuis
+          </button>
+          <button type="button" data-view="all" class="view-tab py-1.5 rounded-lg transition text-slate-400 hover:text-slate-200">
+            Semua
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+
+    <!-- Left Column: Atom Canvas + Spectrum + Controls -->
+    <section id="labSection" class="lg:col-span-7 flex flex-col rounded-2xl bg-panel border border-slate-800 overflow-hidden shadow-2xl">
+      <!-- Top Action Strip -->
+      <div class="px-3 sm:px-4 py-2.5 bg-slate-900/75 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
+        <div class="flex items-center justify-between sm:justify-start gap-2">
+          <span id="activeBadge" class="px-2.5 py-1 rounded-lg font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+            Model Bohr (1913)
+          </span>
+          <span id="elementReadout" class="text-slate-400 font-mono text-[11px] sm:text-xs">
+            Hidrogen (H) • Z=1
+          </span>
+        </div>
+
+        <div class="grid grid-cols-3 sm:flex items-center gap-1.5 sm:gap-2">
+          <button id="exciteBtn" type="button"
+            class="min-h-[38px] px-2.5 py-1.5 rounded-lg bg-fuchsia-500/20 hover:bg-fuchsia-500/30 active:scale-[0.98] text-fuchsia-200 border border-fuchsia-400/40 font-medium transition flex items-center justify-center gap-1 disabled:opacity-35 disabled:pointer-events-none">
+            <span>⚡</span>
+            <span id="exciteBtnLabel">Transisi</span>
+          </button>
+          <button id="pauseBtn" type="button"
+            class="min-h-[38px] px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-200 border border-slate-700 font-medium transition text-center">
+            ⏸ Pause
+          </button>
+          <button id="resetBtn" type="button"
+            class="min-h-[38px] px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-200 border border-slate-700 font-medium transition text-center">
+            ↺ Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Alpha Energy Bar -->
+      <div id="alphaBar" class="hidden px-3 sm:px-4 py-2.5 bg-amber-950/25 border-b border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div class="flex items-center justify-between sm:justify-start gap-2.5 flex-1">
+          <label for="alphaEnergySlider" class="text-amber-200 font-medium shrink-0">
+            ☢ Energi α:
+          </label>
+          <input id="alphaEnergySlider" type="range" min="1.0" max="10.0" step="0.5" value="4.5"
+            class="w-full max-w-[180px] h-2 bg-slate-800 rounded-lg accent-amber-400 cursor-pointer" />
+          <span id="alphaEnergyVal" class="font-mono font-bold text-amber-300 shrink-0">4.5 MeV</span>
+        </div>
+        <div id="alphaStats" class="font-mono text-[11px] text-slate-300 flex items-center gap-3">
+          <span>Deteksi: <strong id="statDetected" class="text-sky-300">0</strong></span>
+          <span>&gt;90°: <strong id="statBackscatter" class="text-amber-300">0</strong></span>
+        </div>
+      </div>
+
+      <!-- Orbital Selector Bar (Mobile-friendly grid) -->
+      <div id="orbitalBar" class="hidden px-3 sm:px-4 py-2.5 bg-indigo-950/35 border-b border-indigo-500/20 text-xs">
+        <div class="text-indigo-200 font-medium mb-1.5 flex items-center gap-1.5">
+          <span>◈</span>
+          <span>Pilih Bentuk Orbital (l):</span>
+        </div>
+        <div class="grid grid-cols-4 sm:flex sm:flex-wrap gap-1.5" id="orbitalButtons">
+          <button type="button" data-orb="s" class="orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition bg-purple-500/25 text-purple-200 border-purple-400/50">s (l=0)</button>
+          <button type="button" data-orb="px" class="orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40">pₓ</button>
+          <button type="button" data-orb="py" class="orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40">pᵧ</button>
+          <button type="button" data-orb="pz" class="orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40">p₂</button>
+          <button type="button" data-orb="dxy" class="orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40">dₓᵧ</button>
+          <button type="button" data-orb="dx2y2" class="orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40">dₓ²⁻y²</button>
+          <button type="button" data-orb="dz2" class="orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40 col-span-2 sm:col-span-1">d₂²</button>
+        </div>
+      </div>
+
+      <!-- Atom Canvas Viewport -->
+      <div class="relative w-full h-[270px] sm:h-[370px] lg:h-[400px] bg-[#050811]">
+        <canvas id="atomCanvas"></canvas>
+
+        <div id="eventToast" class="opacity-0 transition-opacity duration-300 max-w-[85%] text-center sm:text-left absolute top-2.5 right-2.5 bg-indigo-950/95 border border-indigo-400/40 text-indigo-200 text-[11px] sm:text-xs px-3 py-1.5 rounded-lg shadow-lg pointer-events-none">
+          Info simulasi
+        </div>
+      </div>
+
+      <!-- Legend Strip -->
+      <div class="px-3 sm:px-4 py-2 bg-slate-950/90 border-t border-slate-800/80 flex items-center justify-between gap-2 text-[11px]">
+        <div id="canvasLegend" class="flex flex-wrap items-center gap-x-3 gap-y-1"></div>
+        <span id="hudCoord" class="font-mono text-slate-500 hidden sm:inline shrink-0">r = —</span>
+      </div>
+
+      <!-- Emission / Absorption Spectrum Panel -->
+      <div class="px-3 sm:px-4 py-3 bg-[#060913] border-t border-slate-800/90">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 text-xs">
+          <div class="flex items-center justify-between sm:justify-start gap-2 flex-wrap">
+            <span class="font-semibold text-slate-200">Spektrum Tampak</span>
+            <div class="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-700">
+              <button id="modeEmissionBtn" type="button"
+                class="min-h-[30px] px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition bg-sky-500/25 text-sky-200 border border-sky-400/40">
+                Emisi
+              </button>
+              <button id="modeAbsorptionBtn" type="button"
+                class="min-h-[30px] px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition text-slate-400 hover:text-slate-200">
+                Absorpsi
+              </button>
+            </div>
+          </div>
+          <span id="lastLineReadout" class="font-mono text-[11px] text-amber-300">
+            380–750 nm • Tap garis
+          </span>
+        </div>
+
+        <div class="relative w-full h-[60px] sm:h-[72px] rounded-xl overflow-hidden border border-slate-800 bg-black">
+          <canvas id="spectrumCanvas"></canvas>
+        </div>
+
+        <div class="mt-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono">
+          <span>380 nm</span>
+          <span id="spectrumModeHint" class="truncate text-center">Garis terang = foton dipancarkan</span>
+          <span>750 nm</span>
+        </div>
+      </div>
+
+      <!-- Bottom Controls Strip -->
+      <div class="px-3 sm:px-4 py-3 bg-slate-900/60 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-3 items-center text-xs">
+        <div>
+          <label for="elementSelect" class="block text-slate-400 mb-1">Unsur Atom</label>
+          <select id="elementSelect" class="w-full min-h-[38px] bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-sky-400">
+            <option value="1" selected>Hidrogen (H) — Z=1</option>
+            <option value="2">Helium (He) — Z=2</option>
+            <option value="3">Litium (Li) — Z=3</option>
+            <option value="6">Karbon (C) — Z=6</option>
+            <option value="10">Neon (Ne) — Z=10</option>
+            <option value="79">Emas (Au) — Z=79</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-slate-400 mb-1">
+            <span>Kecepatan</span>
+            <span id="speedVal" class="font-mono text-sky-300">1.0x</span>
+          </div>
+          <input id="speedSlider" type="range" min="0.1" max="3.0" step="0.1" value="1.0"
+            class="w-full h-2 bg-slate-800 rounded-lg accent-sky-400 cursor-pointer" />
+        </div>
+
+        <div class="flex items-center justify-around sm:justify-end gap-4 pt-0.5 sm:pt-4">
+          <label class="inline-flex items-center gap-2 text-slate-300 cursor-pointer select-none min-h-[36px]">
+            <input id="showGuides" type="checkbox" checked class="w-4 h-4 rounded accent-sky-400" />
+            <span>Garis</span>
+          </label>
+          <label class="inline-flex items-center gap-2 text-slate-300 cursor-pointer select-none min-h-[36px]">
+            <input id="showLabels" type="checkbox" checked class="w-4 h-4 rounded accent-sky-400" />
+            <span>Label</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Quiz + Energy Diagram (n) + Theory Info -->
+    <aside id="sidePanel" class="lg:col-span-5 flex flex-col gap-3 sm:gap-4">
+
+      <!-- Interactive Quiz Card -->
+      <div id="quizCard" class="hidden rounded-2xl bg-gradient-to-b from-emerald-950/35 to-panel border border-emerald-500/35 p-3.5 sm:p-4 shadow-xl">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <span id="quizCategoryBadge" class="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+            Kuis Teori Atom
+          </span>
+          <div class="font-mono text-xs text-slate-200 flex items-center gap-2.5">
+            <span>Soal <strong id="quizNum" class="text-emerald-300">1</strong></span>
+            <span>Skor: <strong id="quizScore" class="text-amber-300">0</strong></span>
+          </div>
+        </div>
+
+        <p id="quizQuestion" class="text-xs sm:text-sm font-semibold text-white leading-relaxed mb-3">
+          Pertanyaan kuis muncul di sini...
+        </p>
+
+        <div id="quizOptions" class="grid grid-cols-1 gap-2 mb-3"></div>
+
+        <div id="quizFeedback" class="hidden p-2.5 rounded-xl text-xs leading-relaxed mb-3 border"></div>
+
+        <div class="flex items-center justify-between gap-2">
+          <button id="quizSkipBtn" type="button"
+            class="min-h-[38px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition">
+            Lewati
+          </button>
+          <button id="quizNextBtn" type="button"
+            class="min-h-[38px] px-3.5 py-1.5 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/35 text-emerald-200 border border-emerald-400/45 text-xs font-bold transition">
+            Soal Berikutnya →
+          </button>
+        </div>
+      </div>
+
+      <!-- Energy Level Transition Diagram Card -->
+      <div class="rounded-2xl bg-panel border border-slate-800 p-3.5 sm:p-4 shadow-xl">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-1.5">
+              <span>⚡</span>
+              <span>Diagram Tingkat Energi (n)</span>
+            </h2>
+            <p class="text-[11px] text-slate-400">
+              Tap tombol transisi untuk melihat lompatan n
+            </p>
+          </div>
+          <span id="transitionBadge" class="font-mono text-[11px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 shrink-0">
+            n=3 → n=2
+          </span>
+        </div>
+
+        <div class="w-full h-[185px] sm:h-[215px] rounded-xl overflow-hidden border border-slate-800 bg-[#050812]">
+          <canvas id="energyCanvas"></canvas>
+        </div>
+
+        <div class="mt-2.5 flex flex-col gap-2 text-xs">
+          <div class="grid grid-cols-4 gap-1.5" id="transitionButtons">
+            <button type="button" data-trans="3-2" class="trans-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] border transition bg-sky-500/25 text-sky-200 border-sky-400/50">3→2 Hα</button>
+            <button type="button" data-trans="4-2" class="trans-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] border transition bg-slate-900 text-slate-300 border-slate-700 hover:border-sky-400/40">4→2 Hβ</button>
+            <button type="button" data-trans="5-2" class="trans-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] border transition bg-slate-900 text-slate-300 border-slate-700 hover:border-sky-400/40">5→2 Hγ</button>
+            <button type="button" data-trans="2-3" class="trans-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] border transition bg-slate-900 text-slate-300 border-slate-700 hover:border-emerald-400/40">2→3 ↑</button>
+          </div>
+          <div class="flex justify-end">
+            <span id="deltaEReadout" class="font-mono text-[11px] text-sky-300">ΔE = 1.89 eV</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theory Deep-Dive Card -->
+      <div class="rounded-2xl bg-panel border border-slate-800 p-4 sm:p-5 shadow-xl flex-1 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span id="yearTag" class="text-xs font-mono px-2.5 py-0.5 rounded-md bg-slate-800 text-sky-300 border border-slate-700">
+              Tahun 1913
+            </span>
+            <span id="scientistTag" class="text-xs text-slate-400 font-medium text-right">
+              Niels Bohr
+            </span>
+          </div>
+
+          <h2 id="theoryTitle" class="text-base sm:text-lg font-bold text-white mb-1.5"></h2>
+          <p id="theorySummary" class="text-xs text-slate-300 leading-relaxed mb-3"></p>
+
+          <div class="mb-3">
+            <h3 class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              Pokok Gagasan Utama
+            </h3>
+            <ul id="postulateList" class="space-y-1.5 text-xs text-slate-300"></ul>
+          </div>
+
+          <div class="grid grid-cols-1 gap-2 mb-3">
+            <div class="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+              <div class="text-[11px] font-semibold text-emerald-400 mb-0.5">✓ Kelebihan / Terobosan</div>
+              <p id="strengthText" class="text-xs text-slate-300 leading-relaxed"></p>
+            </div>
+            <div class="p-2.5 rounded-xl bg-rose-950/30 border border-rose-500/20">
+              <div class="text-[11px] font-semibold text-rose-400 mb-0.5">✕ Keterbatasan</div>
+              <p id="limitationText" class="text-xs text-slate-300 leading-relaxed"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+          <div class="text-[11px] uppercase tracking-wider text-slate-400 mb-1">
+            Representasi Fisika / Konsep Kunci
+          </div>
+          <div id="formulaBox" class="font-mono text-xs text-sky-300 break-words"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const ELEMENTS = {
+      1: {
+        symbol: 'H', name: 'Hidrogen', Z: 1, shells: [1],
+        lines: [
+          { nm: 410.2, label: 'Hδ (n=6↔2)', intensity: 0.72 },
+          { nm: 434.0, label: 'Hγ (n=5↔2)', intensity: 0.85 },
+          { nm: 486.1, label: 'Hβ (n=4↔2)', intensity: 0.96 },
+          { nm: 656.3, label: 'Hα (n=3↔2)', intensity: 1.00 }
+        ]
+      },
+      2: {
+        symbol: 'He', name: 'Helium', Z: 2, shells: [2],
+        lines: [
+          { nm: 447.1, label: 'He I (447 nm)', intensity: 0.80 },
+          { nm: 501.6, label: 'He I (502 nm)', intensity: 0.78 },
+          { nm: 587.6, label: 'He D3 (588 nm)', intensity: 1.00 },
+          { nm: 667.8, label: 'He I (668 nm)', intensity: 0.85 }
+        ]
+      },
+      3: {
+        symbol: 'Li', name: 'Litium', Z: 3, shells: [2, 1],
+        lines: [
+          { nm: 460.3, label: 'Li I (460 nm)', intensity: 0.75 },
+          { nm: 610.4, label: 'Li I (610 nm)', intensity: 0.82 },
+          { nm: 670.8, label: 'Li I (671 nm)', intensity: 1.00 }
+        ]
+      },
+      6: {
+        symbol: 'C', name: 'Karbon', Z: 6, shells: [2, 4],
+        lines: [
+          { nm: 426.7, label: 'C II (427 nm)', intensity: 0.80 },
+          { nm: 514.5, label: 'C I (515 nm)', intensity: 0.76 },
+          { nm: 538.0, label: 'C I (538 nm)', intensity: 0.74 },
+          { nm: 658.3, label: 'C II (658 nm)', intensity: 0.88 }
+        ]
+      },
+      10: {
+        symbol: 'Ne', name: 'Neon', Z: 10, shells: [2, 8],
+        lines: [
+          { nm: 540.1, label: 'Ne I (540 nm)', intensity: 0.78 },
+          { nm: 585.2, label: 'Ne I (585 nm)', intensity: 0.92 },
+          { nm: 614.3, label: 'Ne I (614 nm)', intensity: 0.95 },
+          { nm: 640.2, label: 'Ne I (640 nm)', intensity: 1.00 },
+          { nm: 703.2, label: 'Ne I (703 nm)', intensity: 0.86 }
+        ]
+      },
+      79: {
+        symbol: 'Au', name: 'Emas', Z: 79, shells: [2, 8, 18, 32, 18, 1],
+        lines: [
+          { nm: 479.3, label: 'Au I (479 nm)', intensity: 0.75 },
+          { nm: 523.0, label: 'Au I (523 nm)', intensity: 0.80 },
+          { nm: 583.7, label: 'Au I (584 nm)', intensity: 0.90 },
+          { nm: 627.8, label: 'Au I (628 nm)', intensity: 1.00 }
+        ]
+      }
+    };
+
+    const THEORIES = {
+      dalton: {
+        badge: 'Model Dalton (1803)',
+        year: 'Tahun 1803',
+        scientist: 'John Dalton',
+        title: 'Teori Atom Dalton — Bola Pejal Masif',
+        summary: 'Atom berupa bola pejal yang keras, tidak dapat dibagi-bagi lagi, serta tidak dapat diciptakan atau dimusnahkan dalam reaksi kimia.',
+        postulates: [
+          'Setiap unsur tersusun atas partikel terkecil yang disebut atom.',
+          'Atom unsur yang sama memiliki massa dan sifat identik.',
+          'Senyawa terbentuk dari gabungan atom berbeda dengan perbandingan bilangan bulat sederhana.'
+        ],
+        strength: 'Menjadi dasar hukum kekekalan massa dan perbandingan tetap.',
+        limitation: 'Belum mengenal elektron, proton, neutron, maupun isotop.',
+        formula: 'Atom = Bola Pejal Indestructible (m_A = konstan)',
+        legend: [
+          { color: '#60a5fa', label: 'Bola Atom Pejal' },
+          { color: '#93c5fd', label: 'Getaran Termal' }
+        ]
+      },
+      thomson: {
+        badge: 'Model Thomson (1897)',
+        year: 'Tahun 1897',
+        scientist: 'J.J. Thomson',
+        title: 'Model Atom Thomson — Roti Kismis',
+        summary: 'Atom berupa bola bermuatan positif merata dengan elektron-elektron bermuatan negatif tertanam di dalamnya sehingga atom bersifat netral.',
+        postulates: [
+          'Muatan positif terdistribusi merata di seluruh volume bola atom.',
+          'Elektron (-) tersebar di dalam bola bermuatan positif (+).',
+          'Total muatan positif dan negatif saling meniadakan.'
+        ],
+        strength: 'Menemukan partikel subatomik bermuatan negatif (elektron).',
+        limitation: 'Tidak dapat menjelaskan hamburan sudut besar sinar alfa pada eksperimen lempeng emas.',
+        formula: 'Q_total = (+Q_bola) + N × (-e) = 0',
+        legend: [
+          { color: '#f97316', label: 'Matriks Positif (+)' },
+          { color: '#38bdf8', label: 'Elektron (-)' }
+        ]
+      },
+      rutherford: {
+        badge: 'Model Rutherford (1911)',
+        year: 'Tahun 1911',
+        scientist: 'Ernest Rutherford',
+        title: 'Model Atom Rutherford — Inti & Tata Surya',
+        summary: 'Sebagian besar volume atom adalah ruang kosong; massa dan muatan positif terpusat pada inti kecil di tengah sementara elektron mengorbit di sekitarnya.',
+        postulates: [
+          'Inti atom sangat kecil, padat, dan bermuatan positif.',
+          'Sebagian besar atom merupakan ruang kosong.',
+          'Gaya tarik elektrostatis berperan sebagai gaya sentripetal orbit elektron.'
+        ],
+        strength: 'Menemukan inti atom yang kecil dan padat.',
+        limitation: 'Menurut fisika klasik, elektron yang berputar seharusnya memancarkan energi kontinu dan jatuh ke inti.',
+        formula: 'F_c = (1 / 4πε₀) · (Z·e²) / r² = m·v² / r',
+        legend: [
+          { color: '#ef4444', label: 'Proton (+)' },
+          { color: '#94a3b8', label: 'Neutron (0)' },
+          { color: '#22d3ee', label: 'Elektron (-)' }
+        ]
+      },
+      alpha_scattering: {
+        badge: 'Hamburan Sinar α (1911)',
+        year: 'Tahun 1911',
+        scientist: 'Geiger, Marsden & Rutherford',
+        title: 'Eksperimen Hamburan Partikel Alfa pada Lempeng Target',
+        summary: 'Partikel alfa (+2e) ditembakkan ke inti atom target (+Ze). Sebagian besar menembus lurus, tetapi partikel yang melintas dekat inti dibelokkan oleh tolakan Coulomb.',
+        postulates: [
+          'Sebagian besar partikel alfa melewati ruang kosong atom hampir tanpa defleksi.',
+          'Tolakan elektrostatis inti (+Ze) terhadap partikel alfa (+2e) menyebabkan pembelokan hiperbolik.',
+          'Sudut hamburan membesar saat energi kinetik E_α kecil atau parameter benturan b kecil.'
+        ],
+        strength: 'Membuktikan bahwa muatan positif dan massa atom terpusat pada inti kecil.',
+        limitation: 'Belum menjelaskan kestabilan elektron dan garis spektrum diskret atom.',
+        formula: 'b = (k · q₁ · q₂) / (2 · E_k) · cot(θ / 2)',
+        legend: [
+          { color: '#facc15', label: 'Partikel Alfa (α, +2e)' },
+          { color: '#f43f5e', label: 'Inti Target (+Ze)' },
+          { color: '#38bdf8', label: 'Kilatan Detektor' }
+        ]
+      },
+      bohr: {
+        badge: 'Model Bohr (1913)',
+        year: 'Tahun 1913',
+        scientist: 'Niels Bohr',
+        title: 'Model Atom Bohr — Kulit Stasioner & Transisi n',
+        summary: 'Elektron bergerak pada kulit stasioner (n = 1, 2, 3...) tanpa memancarkan energi, dan berpindah tingkat energi saat menyerap (absorpsi) atau memancarkan (emisi) foton.',
+        postulates: [
+          'Elektron hanya menempati kulit stasioner dengan energi terkuantisasi E_n.',
+          'Emisi terjadi saat elektron turun tingkat energi (ΔE = h·c / λ).',
+          'Absorpsi terjadi saat elektron menyerap foton yang tepat sama dengan selisih energi ΔE.'
+        ],
+        strength: 'Menjelaskan garis spektrum emisi dan absorpsi atom hidrogen.',
+        limitation: 'Kurang akurat untuk atom berelektron banyak dan mengabaikan ketidakpastian kuantum.',
+        formula: 'E_n = -13.6 eV / n²   |   |ΔE| = h·c / λ',
+        legend: [
+          { color: '#f43f5e', label: 'Inti Atom' },
+          { color: '#38bdf8', label: 'Kulit (n)' },
+          { color: '#34d399', label: 'Foton (Emisi/Absorpsi)' }
+        ]
+      },
+      quantum: {
+        badge: 'Mekanika Kuantum (1926)',
+        year: 'Tahun 1926',
+        scientist: 'Schrödinger, Heisenberg & Born',
+        title: 'Model Mekanika Kuantum — Orbital s, p, d & |ψ|²',
+        summary: 'Posisi elektron dinyatakan oleh fungsi gelombang ψ; |ψ|² menunjukkan rapat probabilitas elektron yang membentuk orbital s (bola), p (cuping ganda), dan d (empat cuping / d₂²).',
+        postulates: [
+          'Elektron bersifat dualisme gelombang-partikel dan tunduk pada prinsip ketidakpastian.',
+          'Bentuk orbital ditentukan bilangan kuantum azimut (l: s=0, p=1, d=2) dan magnetik (m).',
+          'Transisi antar keadaan kuantum menghasilkan garis spektrum emisi maupun absorpsi.'
+        ],
+        strength: 'Model modern paling akurat untuk struktur elektronik, ikatan kimia, dan spektroskopi.',
+        limitation: 'Perhitungan eksak untuk atom banyak elektron memerlukan pendekatan komputasi.',
+        formula: 'Ĥψ = Eψ   |   P(r,θ,φ) ∝ |ψ_{n,l,m}|²',
+        legend: [
+          { color: '#c084fc', label: 'Fase Positif (+ψ)' },
+          { color: '#22d3ee', label: 'Fase Negatif (-ψ)' },
+          { color: '#fb7185', label: 'Inti Atom' }
+        ]
+      }
+    };
+
+    const ORBITAL_INFO = {
+      s:     { name: 'Orbital s (l=0)', desc: 'Simetri bola sferis mengelilingi inti (1 orientasi m=0).' },
+      px:    { name: 'Orbital pₓ (l=1)', desc: 'Dua cuping berlawanan fase di sepanjang sumbu-X.' },
+      py:    { name: 'Orbital pᵧ (l=1)', desc: 'Dua cuping berlawanan fase di sepanjang sumbu-Y.' },
+      pz:    { name: 'Orbital p₂ (l=1)', desc: 'Dua cuping berlawanan fase di sepanjang sumbu-Z.' },
+      dxy:   { name: 'Orbital dₓᵧ (l=2)', desc: 'Empat cuping di bidang XY di antara sumbu X dan Y.' },
+      dx2y2: { name: 'Orbital dₓ²⁻y² (l=2)', desc: 'Empat cuping tepat di sepanjang sumbu X dan Y.' },
+      dz2:   { name: 'Orbital d₂² (l=2)', desc: 'Dua cuping di sumbu-Z dan cincin di bidang ekuator.' }
+    };
+
+    const QUIZ_BANK = [
+      {
+        category: 'Tebak Teori Atom',
+        question: 'Perhatikan visualisasi pada canvas! Model atom manakah yang menggambarkan atom sebagai bola pejal masif tanpa partikel subatomik?',
+        setup: () => { state.theory = 'dalton'; },
+        options: [
+          'Model Atom Dalton (1803)',
+          'Model Roti Kismis Thomson (1897)',
+          'Model Kulit Stasioner Bohr (1913)'
+        ],
+        correct: 0,
+        explanation: 'John Dalton (1803) menggambarkan atom sebagai bola pejal yang keras dan tidak dapat dibagi-bagi lagi.'
+      },
+      {
+        category: 'Tebak Teori Atom',
+        question: 'Pada visualisasi hamburan partikel α ini, mengapa sebagian besar partikel menembus lurus sedangkan yang dekat inti membelok tajam?',
+        setup: () => { state.theory = 'alpha_scattering'; state.atomicNumber = 79; state.alphaEnergyMeV = 3.5; },
+        options: [
+          'Elektron di kulit terluar menarik partikel alfa ke segala arah',
+          'Muatan positif (+Ze) dan massa terpusat di inti kecil sehingga timbul tolakan Coulomb',
+          'Atom emas bersifat magnetik terhadap partikel alfa'
+        ],
+        correct: 1,
+        explanation: 'Eksperimen Rutherford membuktikan inti atom sangat kecil, padat, dan bermuatan positif sehingga menimbulkan tolakan elektrostatis kuat saat partikel α (+2e) melintas dekat.'
+      },
+      {
+        category: 'Tebak Teori Atom',
+        question: 'Model atom manakah yang memperkenalkan kulit stasioner (n = 1, 2, 3...) tempat elektron mengorbit tanpa memancarkan energi?',
+        setup: () => { state.theory = 'bohr'; state.atomicNumber = 1; },
+        options: [
+          'Model Atom Bohr (1913)',
+          'Model Bola Pejal Dalton (1803)',
+          'Model Roti Kismis Thomson (1897)'
+        ],
+        correct: 0,
+        explanation: 'Niels Bohr (1913) menetapkan orbit stasioner terkuantisasi sehingga elektron tidak jatuh ke inti dan memancarkan/menyerap foton hanya saat transisi.'
+      },
+      {
+        category: 'Tebak Bentuk Orbital',
+        question: 'Lihat awan probabilitas |ψ|² pada canvas kuantum! Bentuk orbital manakah yang memiliki simetri bola sferis dengan bilangan kuantum azimut l = 0?',
+        setup: () => { state.theory = 'quantum'; state.orbital = 's'; },
+        options: [
+          'Orbital s (l = 0)',
+          'Orbital pₓ (l = 1)',
+          'Orbital dₓᵧ (l = 2)'
+        ],
+        correct: 0,
+        explanation: 'Orbital s (l = 0) berbentuk bola simetris di sekitar inti atom.'
+      },
+      {
+        category: 'Tebak Bentuk Orbital',
+        question: 'Awan probabilitas pada canvas menunjukkan dua cuping berlawanan fase di sepanjang sumbu horizontal X. Orbital manakah ini?',
+        setup: () => { state.theory = 'quantum'; state.orbital = 'px'; },
+        options: [
+          'Orbital s (l = 0)',
+          'Orbital pₓ (l = 1)',
+          'Orbital d₂² (l = 2)'
+        ],
+        correct: 1,
+        explanation: 'Orbital pₓ (l = 1) terdiri atas dua cuping dengan fase gelombang berlawanan di sepanjang sumbu-X.'
+      },
+      {
+        category: 'Tebak Bentuk Orbital',
+        question: 'Perhatikan pola empat cuping yang berorientasi di antara sumbu X dan Y pada canvas. Jenis orbital manakah yang ditampilkan?',
+        setup: () => { state.theory = 'quantum'; state.orbital = 'dxy'; },
+        options: [
+          'Orbital p₂ (l = 1)',
+          'Orbital dₓᵧ (l = 2)',
+          'Orbital s (l = 0)'
+        ],
+        correct: 1,
+        explanation: 'Orbital dₓᵧ (l = 2) memiliki empat cuping yang terletak di bidang XY di antara sumbu-X dan sumbu-Y.'
+      },
+      {
+        category: 'Panjang Gelombang Emisi / Absorpsi',
+        question: 'Pada deret Balmer atom Hidrogen (transisi n=3 → n=2), foton cahaya tampak merah dipancarkan pada panjang gelombang sekitar berapa nm?',
+        setup: () => { state.theory = 'bohr'; state.atomicNumber = 1; applyTransition(3, 2, ELEMENTS[1].lines[3]); },
+        options: [
+          '656.3 nm (Garis Hα merah)',
+          '486.1 nm (Garis Hβ biru-sian)',
+          '380.0 nm (Ujung ungu)'
+        ],
+        correct: 0,
+        explanation: 'Transisi elektron dari n=3 ke n=2 pada atom Hidrogen menghasilkan garis emisi Hα pada sekitar 656.3 nm (cahaya merah).'
+      },
+      {
+        category: 'Panjang Gelombang Emisi / Absorpsi',
+        question: 'Saat spektrum beralih ke mode ABSORPSI (garis gelap pada pita cahaya tampak), apa yang sebenarnya terjadi pada elektron?',
+        setup: () => { state.theory = 'bohr'; state.atomicNumber = 1; applyTransition(2, 4, ELEMENTS[1].lines[2]); },
+        options: [
+          'Elektron menyerap foton dengan energi ΔE yang sesuai untuk naik ke tingkat energi lebih tinggi',
+          'Elektron jatuh ke inti atom dan melepaskan energi panas kontinu',
+          'Elektron berhenti bergerak dan memantulkan semua warna sama rata'
+        ],
+        correct: 0,
+        explanation: 'Garis gelap pada spektrum absorpsi muncul karena panjang gelombang foton tertentu diserap oleh atom untuk menaikkan elektron ke tingkat energi lebih tinggi.'
+      }
+    ];
+
+    function wavelengthToRGB(nm, alpha = 1) {
+      let r = 0, g = 0, b = 0;
+      if (nm >= 380 && nm < 440) {
+        r = -(nm - 440) / (440 - 380);
+        b = 1;
+      } else if (nm >= 440 && nm < 490) {
+        g = (nm - 440) / (490 - 440);
+        b = 1;
+      } else if (nm >= 490 && nm < 510) {
+        g = 1;
+        b = -(nm - 510) / (510 - 490);
+      } else if (nm >= 510 && nm < 580) {
+        r = (nm - 510) / (580 - 510);
+        g = 1;
+      } else if (nm >= 580 && nm < 645) {
+        r = 1;
+        g = -(nm - 645) / (645 - 580);
+      } else if (nm >= 645 && nm <= 750) {
+        r = 1;
+      }
+
+      let factor = 1;
+      if (nm >= 380 && nm < 420) factor = 0.35 + 0.65 * (nm - 380) / (420 - 380);
+      else if (nm > 700 && nm <= 750) factor = 0.35 + 0.65 * (750 - nm) / (750 - 700);
+
+      const R = Math.round(Math.min(255, Math.max(0, r * factor * 255)));
+      const G = Math.round(Math.min(255, Math.max(0, g * factor * 255)));
+      const B = Math.round(Math.min(255, Math.max(0, b * factor * 255)));
+      return `rgba(${R}, ${G}, ${B}, ${alpha})`;
+    }
+
+    const atomCanvas = document.getElementById('atomCanvas');
+    const actx = atomCanvas.getContext('2d');
+    const specCanvas = document.getElementById('spectrumCanvas');
+    const sctx = specCanvas.getContext('2d');
+    const energyCanvas = document.getElementById('energyCanvas');
+    const ectx = energyCanvas.getContext('2d');
+
+    const labSection = document.getElementById('labSection');
+    const sidePanel = document.getElementById('sidePanel');
+
+    const quizToggleBtn = document.getElementById('quizToggleBtn');
+    const quizToggleText = document.getElementById('quizToggleText');
+    const quizCard = document.getElementById('quizCard');
+    const quizCategoryBadge = document.getElementById('quizCategoryBadge');
+    const quizNum = document.getElementById('quizNum');
+    const quizScore = document.getElementById('quizScore');
+    const quizQuestion = document.getElementById('quizQuestion');
+    const quizOptions = document.getElementById('quizOptions');
+    const quizFeedback = document.getElementById('quizFeedback');
+    const quizSkipBtn = document.getElementById('quizSkipBtn');
+    const quizNextBtn = document.getElementById('quizNextBtn');
+
+    const theorySelect = document.getElementById('theorySelect');
+    const elementSelect = document.getElementById('elementSelect');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedVal = document.getElementById('speedVal');
+    const alphaEnergySlider = document.getElementById('alphaEnergySlider');
+    const alphaEnergyVal = document.getElementById('alphaEnergyVal');
+    const alphaBar = document.getElementById('alphaBar');
+    const orbitalBar = document.getElementById('orbitalBar');
+    const exciteBtnLabel = document.getElementById('exciteBtnLabel');
+    const showGuidesCheckbox = document.getElementById('showGuides');
+    const showLabelsCheckbox = document.getElementById('showLabels');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const exciteBtn = document.getElementById('exciteBtn');
+    const modeEmissionBtn = document.getElementById('modeEmissionBtn');
+    const modeAbsorptionBtn = document.getElementById('modeAbsorptionBtn');
+    const spectrumModeHint = document.getElementById('spectrumModeHint');
+    const eventToast = document.getElementById('eventToast');
+    const hudCoord = document.getElementById('hudCoord');
+    const lastLineReadout = document.getElementById('lastLineReadout');
+    const statDetected = document.getElementById('statDetected');
+    const statBackscatter = document.getElementById('statBackscatter');
+    const transitionBadge = document.getElementById('transitionBadge');
+    const deltaEReadout = document.getElementById('deltaEReadout');
+
+    let atomView = { w: 360, h: 270, cx: 180, cy: 128 };
+    let specView = { w: 360, h: 60 };
+    let energyView = { w: 340, h: 185 };
+
+    let state = {
+      mobileView: 'lab', // 'lab' | 'panel' | 'all'
+      theory: 'bohr',
+      orbital: 's',
+      atomicNumber: 1,
+      alphaEnergyMeV: 4.5,
+      spectrumMode: 'emission',
+      nFrom: 3,
+      nTo: 2,
+      activeShellHighlight: 2,
+      speed: 1.0,
+      paused: false,
+      showGuides: true,
+      showLabels: true,
+      time: 0,
+      spawnTimer: 0,
+      detectedCount: 0,
+      backscatterCount: 0,
+      activeLineNm: 656.3,
+      highlightedLines: new Set([656.3]),
+      pointer: { x: null, y: null, active: false },
+      alphaParticles: [],
+      scintillations: [],
+      bohrElectrons: [],
+      rutherfordElectrons: [],
+      thomsonElectrons: [],
+      daltonMicroParticles: [],
+      orbitalCloud: [],
+      photons: [],
+      quizActive: false,
+      quizIndex: 0,
+      quizQuestionCount: 0,
+      quizScore: 0,
+      quizAnswered: false
+    };
+
+    function applyMobileView() {
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop || state.mobileView === 'all') {
+        labSection.classList.remove('hidden');
+        sidePanel.classList.remove('hidden');
+      } else if (state.mobileView === 'lab') {
+        labSection.classList.remove('hidden');
+        sidePanel.classList.add('hidden');
+      } else if (state.mobileView === 'panel') {
+        labSection.classList.add('hidden');
+        sidePanel.classList.remove('hidden');
+      }
+
+      document.querySelectorAll('.view-tab').forEach((btn) => {
+        const active = btn.dataset.view === state.mobileView;
+        btn.className = active
+          ? 'view-tab py-1.5 rounded-lg transition bg-sky-500/25 text-sky-200 border border-sky-400/40'
+          : 'view-tab py-1.5 rounded-lg transition text-slate-400 hover:text-slate-200';
+      });
+
+      resizeCanvases();
+    }
+
+    document.querySelectorAll('.view-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.mobileView = btn.dataset.view;
+        applyMobileView();
+      });
+    });
+
+    function getElement() {
+      return ELEMENTS[state.atomicNumber] || ELEMENTS[1];
+    }
+
+    function getAtomRadius() {
+      const { w, h } = atomView;
+      return Math.max(64, Math.min(w * 0.38, h * 0.31));
+    }
+
+    function energyLevelEV(n, Z = 1) {
+      const zEff = Math.min(Z, 3);
+      return -13.6 * (zEff * zEff) / (n * n);
+    }
+
+    function evalOrbitalAmplitude(orb, xNorm, yNorm, zNorm) {
+      const r = Math.hypot(xNorm, yNorm, zNorm) || 1e-5;
+      const ux = xNorm / r;
+      const uy = yNorm / r;
+      const uz = zNorm / r;
+
+      switch (orb) {
+        case 's': return 0.72;
+        case 'px': return ux * 1.35;
+        case 'py': return uy * 1.35;
+        case 'pz': return uz * 1.35;
+        case 'dxy': return 2.1 * ux * uy;
+        case 'dx2y2': return 1.25 * (ux * ux - uy * uy);
+        case 'dz2': return 0.85 * (3 * uz * uz - 1);
+        default: return 0.72;
+      }
+    }
+
+    function buildOrbitalCloud() {
+      const orb = state.orbital;
+      const count = 380;
+      const pts = [];
+      let attempts = 0;
+
+      while (pts.length < count && attempts < 4500) {
+        attempts++;
+        const u = Math.random();
+        const v = Math.random();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        const sinPhi = Math.sin(phi);
+        const dx = sinPhi * Math.cos(theta);
+        const dy = Math.cos(phi);
+        const dz = sinPhi * Math.sin(theta);
+
+        const amp = evalOrbitalAmplitude(orb, dx, dy, dz);
+        const prob = Math.min(1, Math.abs(amp));
+
+        if (Math.random() < prob * 0.88 + 0.04) {
+          const rNorm = 0.25 + Math.pow(Math.random(), 0.75) * 0.72;
+          pts.push({
+            x0: dx * rNorm,
+            y0: dy * rNorm,
+            z0: dz * rNorm,
+            sign: amp >= 0 ? 1 : -1,
+            weight: Math.min(1, Math.abs(amp)),
+            size: 1.3 + Math.min(1.8, Math.abs(amp) * 1.4)
+          });
+        }
+      }
+      state.orbitalCloud = pts;
+    }
+
+    function spawnAlphaBurst(count = 1) {
+      const { w, h } = atomView;
+      const startX = Math.max(36, w * 0.12);
+      const targetCenterY = h * 0.48;
+      const spreadY = Math.min(76, h * 0.24);
+      const baseSpeed = 92 + Math.sqrt(state.alphaEnergyMeV) * 65;
+
+      for (let i = 0; i < count; i++) {
+        const biasedRandom = (Math.random() - 0.5) * 2;
+        const offsetNorm = Math.sign(biasedRandom) * Math.pow(Math.abs(biasedRandom), 1.35);
+        const y = targetCenterY + offsetNorm * spreadY;
+        const ang = (Math.random() - 0.5) * 0.04;
+
+        state.alphaParticles.push({
+          x: startX,
+          y,
+          vx: Math.cos(ang) * baseSpeed,
+          vy: Math.sin(ang) * baseSpeed,
+          energyMeV: state.alphaEnergyMeV,
+          trail: []
+        });
+      }
+    }
+
+    function initEntities() {
+      const el = getElement();
+      const Z = el.Z;
+
+      const daltonCount = Math.min(22, 8 + Z * 2);
+      state.daltonMicroParticles = Array.from({ length: daltonCount }, (_, i) => ({
+        baseAngle: i * 2.39996,
+        rNorm: Math.sqrt((i + 0.5) / daltonCount) * 0.80,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      state.thomsonElectrons = Array.from({ length: Math.min(12, Z) }, (_, i) => ({
+        angle: (i / Math.min(12, Z)) * Math.PI * 2 + 0.4,
+        dist: 0.25 + ((i * 37) % 55) / 100,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      state.rutherfordElectrons = Array.from({ length: Math.min(12, Z) }, (_, i) => {
+        const total = Math.min(12, Z);
+        return {
+          angle: (i / total) * Math.PI * 2,
+          speed: (1.5 + (i % 3) * 0.45) * (i % 2 === 0 ? 1 : -1),
+          tiltX: ((i * 0.65) % 1.1) - 0.55,
+          rotZ: (i * 2.39996) % (Math.PI * 2),
+          radiusScale: 0.78 + (i % 4) * 0.12,
+          trail: []
+        };
+      });
+
+      state.bohrElectrons = [];
+      el.shells.forEach((countInShell, shellIdx) => {
+        const n = shellIdx + 1;
+        const shown = Math.min(countInShell, 6);
+        for (let k = 0; k < shown; k++) {
+          state.bohrElectrons.push({
+            baseShell: n,
+            currentShell: n,
+            targetShell: n,
+            exciteTimer: 0,
+            angle: (k / shown) * Math.PI * 2 + n * 0.5,
+            speed: (2.2 / Math.sqrt(n)) * (n % 2 === 0 ? -1 : 1)
+          });
+        }
+      });
+
+      buildOrbitalCloud();
+      state.alphaParticles = [];
+      state.scintillations = [];
+      state.photons = [];
+      state.spawnTimer = 0;
+
+      if (state.theory === 'alpha_scattering') {
+        spawnAlphaBurst(4);
+      }
+    }
+
+    function applyTransition(nFrom, nTo, lineObj = null) {
+      const el = getElement();
+      state.nFrom = nFrom;
+      state.nTo = nTo;
+      state.activeShellHighlight = nTo;
+
+      const isAbsorption = nTo > nFrom;
+      state.spectrumMode = isAbsorption ? 'absorption' : 'emission';
+
+      const chosen = lineObj || el.lines[Math.min(el.lines.length - 1, Math.max(0, Math.abs(nFrom - nTo) - 1))];
+      state.activeLineNm = chosen.nm;
+      state.highlightedLines.add(chosen.nm);
+
+      const e1 = energyLevelEV(nFrom, el.Z);
+      const e2 = energyLevelEV(nTo, el.Z);
+      const dE = Math.abs(e2 - e1);
+
+      transitionBadge.textContent = `n=${nFrom} → n=${nTo}`;
+      deltaEReadout.textContent = `ΔE = ${dE.toFixed(2)} eV • ${chosen.nm} nm`;
+
+      const { cx, cy } = atomView;
+      const color = wavelengthToRGB(chosen.nm, 1);
+
+      if (isAbsorption) {
+        for (let i = 0; i < 3; i++) {
+          const ang = (i / 3) * Math.PI * 2 + state.time;
+          state.photons.push({
+            x: cx + Math.cos(ang) * 95,
+            y: cy + Math.sin(ang) * 95,
+            vx: -Math.cos(ang) * 130,
+            vy: -Math.sin(ang) * 130,
+            phase: i,
+            color,
+            life: 1.15
+          });
+        }
+        lastLineReadout.innerHTML = `<span style="color:${color}">■ Serap ${chosen.nm} nm</span>`;
+        showToast(`Absorpsi λ = ${chosen.nm} nm (naik n=${nTo})`);
+      } else {
+        for (let i = 0; i < 4; i++) {
+          const ang = (i / 4) * Math.PI * 2 + state.time * 1.2;
+          state.photons.push({
+            x: cx,
+            y: cy,
+            vx: Math.cos(ang) * 150,
+            vy: Math.sin(ang) * 150,
+            phase: i * 1.4,
+            color,
+            life: 1.45
+          });
+        }
+        lastLineReadout.innerHTML = `<span style="color:${color}">● Emisi ${chosen.nm} nm</span>`;
+        showToast(`Emisi λ = ${chosen.nm} nm (turun n=${nTo})`);
+      }
+
+      if (state.theory === 'bohr' && state.bohrElectrons.length > 0) {
+        const elec = state.bohrElectrons[0];
+        elec.targetShell = Math.min(5, Math.max(1, nTo));
+        elec.exciteTimer = 1.8;
+      }
+
+      syncSpectrumButtons();
+      drawSpectrum();
+      drawEnergyDiagram();
+    }
+
+    function syncSpectrumButtons() {
+      const isEm = state.spectrumMode === 'emission';
+      modeEmissionBtn.className = isEm
+        ? 'min-h-[30px] px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition bg-sky-500/25 text-sky-200 border border-sky-400/40'
+        : 'min-h-[30px] px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition text-slate-400 hover:text-slate-200';
+
+      modeAbsorptionBtn.className = !isEm
+        ? 'min-h-[30px] px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition bg-amber-500/25 text-amber-200 border border-amber-400/40'
+        : 'min-h-[30px] px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition text-slate-400 hover:text-slate-200';
+
+      spectrumModeHint.textContent = isEm
+        ? 'Garis terang = emisi foton'
+        : 'Garis gelap = absorpsi foton';
+    }
+
+    function syncUI() {
+      const t = THEORIES[state.theory];
+      const el = getElement();
+
+      theorySelect.value = state.theory;
+      elementSelect.value = String(state.atomicNumber);
+      alphaEnergySlider.value = String(state.alphaEnergyMeV);
+      alphaEnergyVal.textContent = `${state.alphaEnergyMeV.toFixed(1)} MeV`;
+
+      document.getElementById('activeBadge').textContent = t.badge;
+      document.getElementById('yearTag').textContent = t.year;
+      document.getElementById('scientistTag').textContent = t.scientist;
+      document.getElementById('theoryTitle').textContent = t.title;
+      document.getElementById('theorySummary').textContent = t.summary;
+      document.getElementById('strengthText').textContent = t.strength;
+      document.getElementById('limitationText').textContent = t.limitation;
+      document.getElementById('formulaBox').textContent = t.formula;
+      document.getElementById('elementReadout').textContent = `${el.name} (${el.symbol}) • Z=${el.Z}`;
+
+      document.getElementById('postulateList').innerHTML = t.postulates
+        .map(p => `<li class="flex items-start gap-2"><span class="text-sky-400 mt-0.5 shrink-0">▸</span><span>${p}</span></li>`)
+        .join('');
+
+      document.getElementById('canvasLegend').innerHTML = t.legend
+        .map(item => `
+          <span class="inline-flex items-center gap-1.5 text-slate-300">
+            <span class="w-2.5 h-2.5 rounded-full inline-block shrink-0" style="background:${item.color}; box-shadow: 0 0 8px ${item.color}80;"></span>
+            <span>${item.label}</span>
+          </span>
+        `)
+        .join('');
+
+      document.querySelectorAll('.orb-btn').forEach((b) => {
+        const active = b.dataset.orb === state.orbital;
+        const baseCls = b.dataset.orb === 'dz2' ? 'orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition col-span-2 sm:col-span-1' : 'orb-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] font-semibold border transition';
+        b.className = active
+          ? `${baseCls} bg-purple-500/25 text-purple-200 border-purple-400/50`
+          : `${baseCls} bg-slate-900/90 text-slate-300 border-slate-700 hover:border-purple-400/40`;
+      });
+
+      alphaBar.classList.toggle('hidden', state.theory !== 'alpha_scattering');
+      orbitalBar.classList.toggle('hidden', state.theory !== 'quantum');
+      exciteBtnLabel.textContent = state.theory === 'alpha_scattering' ? 'Tembak α' : 'Transisi';
+      statDetected.textContent = String(state.detectedCount);
+      statBackscatter.textContent = String(state.backscatterCount);
+
+      syncSpectrumButtons();
+      drawSpectrum();
+      drawEnergyDiagram();
+    }
+
+    // Quiz Engine
+    function loadQuizQuestion(idx) {
+      const q = QUIZ_BANK[idx % QUIZ_BANK.length];
+      state.quizIndex = idx % QUIZ_BANK.length;
+      state.quizQuestionCount += 1;
+      state.quizAnswered = false;
+
+      q.setup();
+      initEntities();
+      syncUI();
+
+      quizCategoryBadge.textContent = q.category;
+      quizNum.textContent = String(state.quizQuestionCount);
+      quizScore.textContent = String(state.quizScore);
+      quizQuestion.textContent = q.question;
+      quizFeedback.classList.add('hidden');
+      quizFeedback.textContent = '';
+
+      quizOptions.innerHTML = '';
+      q.options.forEach((optText, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'w-full min-h-[42px] text-left px-3 py-2 rounded-xl bg-slate-900/95 hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 transition flex items-start gap-2.5';
+        const letter = ['A', 'B', 'C'][i] || String(i + 1);
+        btn.innerHTML = `<span class="font-mono font-bold text-sky-400 shrink-0">${letter}.</span><span>${optText}</span>`;
+        btn.addEventListener('click', () => handleQuizAnswer(i, q));
+        quizOptions.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(choiceIdx, q) {
+      if (state.quizAnswered) return;
+      state.quizAnswered = true;
+
+      const optionBtns = quizOptions.querySelectorAll('button');
+      optionBtns.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.correct) {
+          btn.className = 'w-full min-h-[42px] text-left px-3 py-2 rounded-xl bg-emerald-950/60 border border-emerald-400 text-xs sm:text-sm text-emerald-200 font-medium flex items-start gap-2.5';
+        } else if (idx === choiceIdx) {
+          btn.className = 'w-full min-h-[42px] text-left px-3 py-2 rounded-xl bg-rose-950/60 border border-rose-400 text-xs sm:text-sm text-rose-200 flex items-start gap-2.5';
+        }
+      });
+
+      quizFeedback.classList.remove('hidden');
+      if (choiceIdx === q.correct) {
+        state.quizScore += 10;
+        quizScore.textContent = String(state.quizScore);
+        quizFeedback.className = 'p-2.5 rounded-xl text-xs leading-relaxed mb-3 border bg-emerald-950/40 border-emerald-500/30 text-emerald-200';
+        quizFeedback.innerHTML = `<strong>✓ Tepat (+10 poin)!</strong> ${q.explanation}`;
+      } else {
+        quizFeedback.className = 'p-2.5 rounded-xl text-xs leading-relaxed mb-3 border bg-rose-950/40 border-rose-500/30 text-rose-200';
+        quizFeedback.innerHTML = `<strong>✕ Kurang tepat.</strong> ${q.explanation}`;
+      }
+    }
+
+    quizToggleBtn.addEventListener('click', () => {
+      state.quizActive = !state.quizActive;
+      quizCard.classList.toggle('hidden', !state.quizActive);
+      quizToggleText.textContent = state.quizActive ? 'Tutup' : 'Kuis';
+      if (state.quizActive) {
+        if (window.innerWidth < 1024) {
+          state.mobileView = 'all';
+          applyMobileView();
+        }
+        loadQuizQuestion(state.quizIndex);
+      } else {
+        showToast('Mode Kuis ditutup');
+      }
+    });
+
+    quizNextBtn.addEventListener('click', () => loadQuizQuestion(state.quizIndex + 1));
+    quizSkipBtn.addEventListener('click', () => loadQuizQuestion(state.quizIndex + 1));
+
+    function showToast(msg) {
+      eventToast.textContent = msg;
+      eventToast.classList.remove('opacity-0');
+      eventToast.classList.add('opacity-100');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        eventToast.classList.remove('opacity-100');
+        eventToast.classList.add('opacity-0');
+      }, 2000);
+    }
+
+    function nmToX(nm) {
+      const ratio = (nm - 380) / (750 - 380);
+      return Math.max(0, Math.min(specView.w, ratio * specView.w));
+    }
+
+    function xToNm(x) {
+      const ratio = Math.max(0, Math.min(1, x / specView.w));
+      return 380 + ratio * (750 - 380);
+    }
+
+    function drawSpectrum() {
+      const { w, h } = specView;
+      if (w <= 0 || h <= 0) return;
+      const el = getElement();
+      const isAbs = state.spectrumMode === 'absorption';
+      sctx.clearRect(0, 0, w, h);
+
+      if (!isAbs) {
+        sctx.fillStyle = '#05070e';
+        sctx.fillRect(0, 0, w, h);
+
+        const bottomGrad = sctx.createLinearGradient(0, 0, w, 0);
+        for (let nm = 380; nm <= 750; nm += 10) {
+          bottomGrad.addColorStop((nm - 380) / 370, wavelengthToRGB(nm, 0.25));
+        }
+        sctx.fillStyle = bottomGrad;
+        sctx.fillRect(0, h - 5, w, 5);
+      } else {
+        const contGrad = sctx.createLinearGradient(0, 0, w, 0);
+        for (let nm = 380; nm <= 750; nm += 8) {
+          contGrad.addColorStop((nm - 380) / 370, wavelengthToRGB(nm, 0.92));
+        }
+        sctx.fillStyle = contGrad;
+        sctx.fillRect(0, 13, w, h - 13);
+      }
+
+      sctx.fillStyle = '#05070e';
+      sctx.fillRect(0, 0, w, 13);
+      sctx.fillStyle = 'rgba(148, 163, 184, 0.55)';
+      sctx.font = '9px ui-monospace, monospace';
+      sctx.textAlign = 'center';
+      for (let nm = 400; nm <= 700; nm += 50) {
+        const tx = nmToX(nm);
+        sctx.fillRect(tx, 0, 1, 4);
+        sctx.fillText(`${nm}`, tx, 11);
+      }
+
+      el.lines.forEach((line) => {
+        const lx = nmToX(line.nm);
+        const isActive = state.activeLineNm === line.nm;
+        const isMarked = state.highlightedLines.has(line.nm);
+
+        if (!isAbs) {
+          const alpha = isActive ? 1 : (isMarked ? 0.9 : 0.42);
+          const lineW = isActive ? 3.4 : (isMarked ? 2.3 : 1.5);
+
+          const glow = sctx.createLinearGradient(lx - 8, 0, lx + 8, 0);
+          glow.addColorStop(0, wavelengthToRGB(line.nm, 0));
+          glow.addColorStop(0.5, wavelengthToRGB(line.nm, alpha * 0.45));
+          glow.addColorStop(1, wavelengthToRGB(line.nm, 0));
+          sctx.fillStyle = glow;
+          sctx.fillRect(lx - 8, 13, 16, h - 18);
+
+          sctx.strokeStyle = wavelengthToRGB(line.nm, alpha);
+          sctx.lineWidth = lineW;
+          sctx.beginPath();
+          sctx.moveTo(lx, 14);
+          sctx.lineTo(lx, h - 5);
+          sctx.stroke();
+        } else {
+          sctx.fillStyle = isActive ? 'rgba(2, 4, 10, 0.98)' : 'rgba(5, 8, 16, 0.85)';
+          const barW = isActive ? 4.2 : 2.6;
+          sctx.fillRect(lx - barW * 0.5, 13, barW, h - 13);
+        }
+
+        if (isActive) {
+          sctx.fillStyle = isAbs ? '#f8fafc' : wavelengthToRGB(line.nm, 1);
+          sctx.font = 'bold 9px ui-monospace, monospace';
+          sctx.textAlign = 'center';
+          const clampedX = Math.max(20, Math.min(w - 20, lx));
+          sctx.fillText(`${Math.round(line.nm)}`, clampedX, h - 6);
+        }
+      });
+    }
+
+    function drawEnergyDiagram() {
+      const { w, h } = energyView;
+      if (w <= 0 || h <= 0) return;
+      const el = getElement();
+      ectx.clearRect(0, 0, w, h);
+      ectx.fillStyle = '#050812';
+      ectx.fillRect(0, 0, w, h);
+
+      const padLeft = 40;
+      const padRight = 58;
+      const topY = 20;
+      const botY = h - 18;
+      const usableH = botY - topY;
+
+      ectx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+      ectx.lineWidth = 1.2;
+      ectx.beginPath();
+      ectx.moveTo(14, botY);
+      ectx.lineTo(14, topY - 6);
+      ectx.lineTo(10, topY - 1);
+      ectx.moveTo(14, topY - 6);
+      ectx.lineTo(18, topY - 1);
+      ectx.stroke();
+
+      const levels = [1, 2, 3, 4, 5];
+      const yMap = {};
+      levels.forEach((n) => {
+        const frac = 1 - Math.pow((5 - n) / 4, 1.35);
+        const y = topY + frac * usableH;
+        yMap[n] = y;
+
+        const isHighlighted = state.nFrom === n || state.nTo === n;
+        ectx.strokeStyle = isHighlighted ? '#38bdf8' : 'rgba(148, 163, 184, 0.35)';
+        ectx.lineWidth = isHighlighted ? 2.2 : 1.3;
+        ectx.beginPath();
+        ectx.moveTo(padLeft, y);
+        ectx.lineTo(w - padRight, y);
+        ectx.stroke();
+
+        const ev = energyLevelEV(n, el.Z);
+        ectx.fillStyle = isHighlighted ? '#e0f2fe' : '#cbd5e1';
+        ectx.font = 'bold 10px ui-monospace, monospace';
+        ectx.textAlign = 'right';
+        ectx.fillText(`n=${n}`, padLeft - 5, y + 3);
+
+        ectx.textAlign = 'left';
+        ectx.fillStyle = isHighlighted ? '#7dd3fc' : '#64748b';
+        ectx.fillText(`${ev.toFixed(1)}`, w - padRight + 5, y + 3);
+      });
+
+      const y1 = yMap[state.nFrom] ?? yMap[3];
+      const y2 = yMap[state.nTo] ?? yMap[2];
+      const arrowX = (padLeft + (w - padRight)) * 0.5;
+      const isAbsorption = state.nTo > state.nFrom;
+      const arrowColor = state.activeLineNm
+        ? wavelengthToRGB(state.activeLineNm, 1)
+        : (isAbsorption ? '#34d399' : '#f472b6');
+
+      ectx.save();
+      ectx.strokeStyle = arrowColor;
+      ectx.fillStyle = arrowColor;
+      ectx.lineWidth = 2.2;
+      ectx.setLineDash(isAbsorption ? [4, 3] : []);
+
+      ectx.beginPath();
+      ectx.moveTo(arrowX, y1);
+      ectx.lineTo(arrowX, y2);
+      ectx.stroke();
+      ectx.setLineDash([]);
+
+      const dir = y2 < y1 ? -1 : 1;
+      ectx.beginPath();
+      ectx.moveTo(arrowX, y2);
+      ectx.lineTo(arrowX - 5, y2 - dir * 7);
+      ectx.lineTo(arrowX + 5, y2 - dir * 7);
+      ectx.closePath();
+      ectx.fill();
+
+      const midY = (y1 + y2) * 0.5;
+      ectx.font = 'bold 10px ui-monospace, monospace';
+      ectx.textAlign = 'left';
+      ectx.fillText(isAbsorption ? 'SERAP' : 'EMISI', arrowX + 7, midY + 3);
+      ectx.restore();
+    }
+
+    modeEmissionBtn.addEventListener('click', () => {
+      state.spectrumMode = 'emission';
+      syncSpectrumButtons();
+      drawSpectrum();
+    });
+
+    modeAbsorptionBtn.addEventListener('click', () => {
+      state.spectrumMode = 'absorption';
+      syncSpectrumButtons();
+      drawSpectrum();
+    });
+
+    specCanvas.addEventListener('pointerdown', (e) => {
+      const rect = specCanvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickedNm = xToNm(clickX);
+      const el = getElement();
+      let nearest = null;
+      let bestDiff = 22;
+      el.lines.forEach((l) => {
+        const d = Math.abs(l.nm - clickedNm);
+        if (d < bestDiff) {
+          bestDiff = d;
+          nearest = l;
+        }
+      });
+      const chosenLine = nearest || { nm: Math.round(clickedNm), label: `Foton (${Math.round(clickedNm)} nm)`, intensity: 0.85 };
+      if (state.spectrumMode === 'absorption') applyTransition(2, 4, chosenLine);
+      else applyTransition(4, 2, chosenLine);
+    });
+
+    document.querySelectorAll('.trans-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const [f, t] = btn.dataset.trans.split('-').map(Number);
+        document.querySelectorAll('.trans-btn').forEach((b) => {
+          const active = b.dataset.trans === btn.dataset.trans;
+          b.className = active
+            ? 'trans-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] border transition bg-sky-500/25 text-sky-200 border-sky-400/50'
+            : 'trans-btn min-h-[36px] px-2 py-1 rounded-lg font-mono text-[11px] border transition bg-slate-900 text-slate-300 border-slate-700 hover:border-sky-400/40';
+        });
+        applyTransition(f, t);
+      });
+    });
+
+    document.querySelectorAll('.orb-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.orbital = btn.dataset.orb;
+        syncUI();
+        buildOrbitalCloud();
+        showToast(`${ORBITAL_INFO[state.orbital].name}`);
+      });
+    });
+
+    function updatePointerFromClient(clientX, clientY) {
+      const rect = atomCanvas.getBoundingClientRect();
+      state.pointer.x = clientX - rect.left;
+      state.pointer.y = clientY - rect.top;
+      state.pointer.active = true;
+      const dist = Math.round(Math.hypot(state.pointer.x - atomView.cx, state.pointer.y - atomView.cy));
+      hudCoord.textContent = `r = ${dist}px`;
+    }
+
+    atomCanvas.addEventListener('pointerdown', (e) => updatePointerFromClient(e.clientX, e.clientY));
+    atomCanvas.addEventListener('pointermove', (e) => {
+      if (e.pointerType === 'mouse' || e.buttons > 0 || state.pointer.active) {
+        updatePointerFromClient(e.clientX, e.clientY);
+      }
+    });
+    atomCanvas.addEventListener('pointerleave', () => {
+      state.pointer.active = false;
+      hudCoord.textContent = 'r = —';
+    });
+
+    theorySelect.addEventListener('change', (e) => {
+      state.theory = e.target.value;
+      initEntities();
+      syncUI();
+    });
+
+    elementSelect.addEventListener('change', (e) => {
+      state.atomicNumber = Number(e.target.value);
+      state.highlightedLines.clear();
+      const firstLine = getElement().lines[0];
+      state.activeLineNm = firstLine ? firstLine.nm : null;
+      if (firstLine) state.highlightedLines.add(firstLine.nm);
+      initEntities();
+      syncUI();
+    });
+
+    alphaEnergySlider.addEventListener('input', (e) => {
+      state.alphaEnergyMeV = Number(e.target.value);
+      alphaEnergyVal.textContent = `${state.alphaEnergyMeV.toFixed(1)} MeV`;
+    });
+
+    speedSlider.addEventListener('input', (e) => {
+      state.speed = Number(e.target.value);
+      speedVal.textContent = `${state.speed.toFixed(1)}x`;
+    });
+
+    showGuidesCheckbox.addEventListener('change', (e) => { state.showGuides = e.target.checked; });
+    showLabelsCheckbox.addEventListener('change', (e) => { state.showLabels = e.target.checked; });
+
+    pauseBtn.addEventListener('click', () => {
+      state.paused = !state.paused;
+      pauseBtn.textContent = state.paused ? '▶ Lanjut' : '⏸ Pause';
+    });
+
+    resetBtn.addEventListener('click', () => {
+      state.time = 0;
+      state.paused = false;
+      state.detectedCount = 0;
+      state.backscatterCount = 0;
+      state.nFrom = 3;
+      state.nTo = 2;
+      state.spectrumMode = 'emission';
+      pauseBtn.textContent = '⏸ Pause';
+      initEntities();
+      syncUI();
+      showToast('Simulasi direset');
+    });
+
+    exciteBtn.addEventListener('click', () => {
+      if (state.theory === 'alpha_scattering') {
+        spawnAlphaBurst(5);
+        showToast(`Menembakkan 5 α (${state.alphaEnergyMeV.toFixed(1)} MeV)`);
+      } else {
+        const nextTo = state.nTo === 2 ? 4 : 2;
+        const nextFrom = nextTo === 2 ? 3 : 2;
+        applyTransition(nextFrom, nextTo);
+      }
+    });
+
+    function resizeCanvases() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      const aParent = atomCanvas.parentElement;
+      const aw = aParent.clientWidth;
+      const ah = aParent.clientHeight;
+      if (aw > 0 && ah > 0) {
+        atomCanvas.width = Math.floor(aw * dpr);
+        atomCanvas.height = Math.floor(ah * dpr);
+        actx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        atomView = { w: aw, h: ah, cx: aw * 0.5, cy: ah * 0.47 };
+      }
+
+      const sParent = specCanvas.parentElement;
+      const sw = sParent.clientWidth;
+      const sh = sParent.clientHeight;
+      if (sw > 0 && sh > 0) {
+        specCanvas.width = Math.floor(sw * dpr);
+        specCanvas.height = Math.floor(sh * dpr);
+        sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        specView = { w: sw, h: sh };
+      }
+
+      const eParent = energyCanvas.parentElement;
+      const ew = eParent.clientWidth;
+      const eh = eParent.clientHeight;
+      if (ew > 0 && eh > 0) {
+        energyCanvas.width = Math.floor(ew * dpr);
+        energyCanvas.height = Math.floor(eh * dpr);
+        ectx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        energyView = { w: ew, h: eh };
+      }
+
+      drawSpectrum();
+      drawEnergyDiagram();
+    }
+
+    function drawNucleus(cx, cy, Z, radius = 12) {
+      const glow = actx.createRadialGradient(cx, cy, 2, cx, cy, radius * 2.4);
+      glow.addColorStop(0, 'rgba(244, 63, 94, 0.35)');
+      glow.addColorStop(1, 'rgba(244, 63, 94, 0)');
+      actx.fillStyle = glow;
+      actx.beginPath();
+      actx.arc(cx, cy, radius * 2.4, 0, Math.PI * 2);
+      actx.fill();
+
+      const count = Math.min(14, Math.max(4, Math.round(Math.sqrt(Z) * 2)));
+      for (let i = 0; i < count; i++) {
+        const ang = i * 2.39996 + state.time * 0.8;
+        const dist = (i === 0 ? 0 : Math.sqrt(i / count) * (radius * 0.65));
+        actx.beginPath();
+        actx.arc(cx + Math.cos(ang) * dist, cy + Math.sin(ang) * dist, Math.max(2.6, radius * 0.22), 0, Math.PI * 2);
+        actx.fillStyle = i % 2 === 0 ? '#f43f5e' : '#94a3b8';
+        actx.fill();
+      }
+    }
+
+    function drawElectron(x, y, r = 4.6, color = '#38bdf8') {
+      const grad = actx.createRadialGradient(x, y, 0.5, x, y, r * 2.4);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.35, color);
+      grad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      actx.fillStyle = grad;
+      actx.beginPath();
+      actx.arc(x, y, r * 2.4, 0, Math.PI * 2);
+      actx.fill();
+
+      actx.beginPath();
+      actx.arc(x, y, r * 0.65, 0, Math.PI * 2);
+      actx.fillStyle = '#f8fafc';
+      actx.fill();
+    }
+
+    function drawPhotons(dt) {
+      for (let i = state.photons.length - 1; i >= 0; i--) {
+        const p = state.photons[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.phase += dt * 22;
+        p.life -= dt * 0.8;
+
+        if (p.life <= 0) {
+          state.photons.splice(i, 1);
+          continue;
+        }
+
+        const angle = Math.atan2(p.vy, p.vx);
+        actx.save();
+        actx.translate(p.x, p.y);
+        actx.rotate(angle);
+        actx.strokeStyle = p.color;
+        actx.globalAlpha = Math.max(0, p.life);
+        actx.lineWidth = 2.2;
+        actx.beginPath();
+        for (let x = -12; x <= 12; x += 2) {
+          const y = Math.sin(x * 0.45 + p.phase) * 4.2;
+          if (x === -12) actx.moveTo(x, y);
+          else actx.lineTo(x, y);
+        }
+        actx.stroke();
+        actx.restore();
+      }
+    }
+
+    function drawBottomCaption(cx, yPos, text, color = '#cbd5e1') {
+      if (!state.showLabels) return;
+      actx.fillStyle = color;
+      actx.font = '10px sans-serif';
+      actx.textAlign = 'center';
+      actx.fillText(text, cx, Math.min(atomView.h - 8, yPos));
+    }
+
+    function renderAlphaScattering(dt) {
+      const { w, h } = atomView;
+      const el = getElement();
+      const targetX = w * 0.56;
+      const spreadY = Math.min(76, h * 0.24);
+      const nuclei = [
+        { x: targetX, y: h * 0.48 - spreadY * 0.72 },
+        { x: targetX, y: h * 0.48 },
+        { x: targetX, y: h * 0.48 + spreadY * 0.72 }
+      ];
+
+      if (dt > 0) {
+        state.spawnTimer += dt;
+        while (state.spawnTimer >= 0.34) {
+          state.spawnTimer -= 0.34;
+          spawnAlphaBurst(1);
+        }
+      }
+
+      const emitX = Math.max(10, w * 0.04);
+      const emitY = h * 0.48 - 20;
+      actx.fillStyle = '#1e293b';
+      actx.strokeStyle = '#475569';
+      actx.lineWidth = 1.5;
+      actx.fillRect(emitX, emitY, 24, 40);
+      actx.strokeRect(emitX, emitY, 24, 40);
+      if (state.showLabels) {
+        actx.fillStyle = '#facc15';
+        actx.font = 'bold 10px ui-monospace, monospace';
+        actx.textAlign = 'center';
+        actx.fillText('α', emitX + 12, emitY + 24);
+      }
+
+      nuclei.forEach((nuc) => drawNucleus(nuc.x, nuc.y, el.Z, 10));
+
+      const repulsionGain = (el.Z / 79) * (400 / Math.pow(state.alphaEnergyMeV, 0.72));
+
+      for (let i = state.alphaParticles.length - 1; i >= 0; i--) {
+        const p = state.alphaParticles[i];
+        p.trail.push({ x: p.x, y: p.y });
+        if (p.trail.length > 20) p.trail.shift();
+
+        if (dt > 0) {
+          let ax = 0, ay = 0;
+          nuclei.forEach((nuc) => {
+            const dx = p.x - nuc.x;
+            const dy = p.y - nuc.y;
+            const r2 = Math.max(170, dx * dx + dy * dy);
+            const r = Math.sqrt(r2);
+            const force = (repulsionGain * 1300) / r2;
+            ax += (dx / r) * force;
+            ay += (dy / r) * force;
+          });
+
+          p.vx += ax * dt;
+          p.vy += ay * dt;
+          const speedMag = 92 + Math.sqrt(p.energyMeV) * 65;
+          const curMag = Math.hypot(p.vx, p.vy) || 1;
+          p.vx = (p.vx / curMag) * speedMag;
+          p.vy = (p.vy / curMag) * speedMag;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+        }
+
+        for (let t = 1; t < p.trail.length; t++) {
+          actx.strokeStyle = `rgba(250, 204, 21, ${(t / p.trail.length) * 0.65})`;
+          actx.lineWidth = 2;
+          actx.beginPath();
+          actx.moveTo(p.trail[t - 1].x, p.trail[t - 1].y);
+          actx.lineTo(p.trail[t].x, p.trail[t].y);
+          actx.stroke();
+        }
+
+        actx.beginPath();
+        actx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        actx.fillStyle = '#facc15';
+        actx.fill();
+
+        if (p.x < 8 || p.x > w - 8 || p.y < 8 || p.y > h - 8) {
+          state.detectedCount += 1;
+          if (p.vx < -20) state.backscatterCount += 1;
+          state.scintillations.push({
+            x: Math.max(10, Math.min(w - 10, p.x)),
+            y: Math.max(10, Math.min(h - 10, p.y)),
+            life: 0.7,
+            isBack: p.vx < -20
+          });
+          statDetected.textContent = String(state.detectedCount);
+          statBackscatter.textContent = String(state.backscatterCount);
+          state.alphaParticles.splice(i, 1);
+        }
+      }
+
+      for (let i = state.scintillations.length - 1; i >= 0; i--) {
+        const sc = state.scintillations[i];
+        sc.life -= dt * 1.4;
+        if (sc.life <= 0) {
+          state.scintillations.splice(i, 1);
+          continue;
+        }
+        actx.beginPath();
+        actx.arc(sc.x, sc.y, 8 * (1.2 - sc.life), 0, Math.PI * 2);
+        actx.strokeStyle = sc.isBack ? `rgba(251, 146, 60, ${sc.life})` : `rgba(56, 189, 248, ${sc.life})`;
+        actx.lineWidth = 2;
+        actx.stroke();
+      }
+
+      drawBottomCaption(w * 0.5, h - 10, `Target ${el.name} (Z=${el.Z}) • E_α = ${state.alphaEnergyMeV.toFixed(1)} MeV`, '#fde68a');
+    }
+
+    function renderDalton() {
+      const { cx, cy } = atomView;
+      const r = getAtomRadius() * 0.9 + Math.sin(state.time * 2.5) * 2;
+      const grad = actx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.08, cx, cy, r);
+      grad.addColorStop(0, '#60a5fa');
+      grad.addColorStop(0.55, '#1d4ed8');
+      grad.addColorStop(1, '#0f172a');
+
+      actx.beginPath();
+      actx.arc(cx, cy, r, 0, Math.PI * 2);
+      actx.fillStyle = grad;
+      actx.fill();
+      actx.lineWidth = 2.4;
+      actx.strokeStyle = '#93c5fd';
+      actx.stroke();
+
+      if (state.showGuides) {
+        state.daltonMicroParticles.forEach((pt) => {
+          const jx = Math.cos(state.time * 9 + pt.phase) * 1.1;
+          const jy = Math.sin(state.time * 9 + pt.phase) * 1.1;
+          const dist = pt.rNorm * r;
+          actx.beginPath();
+          actx.arc(cx + Math.cos(pt.baseAngle) * dist + jx, cy + Math.sin(pt.baseAngle) * dist + jy, 1.9, 0, Math.PI * 2);
+          actx.fillStyle = 'rgba(191, 219, 254, 0.32)';
+          actx.fill();
+        });
+      }
+
+      if (state.showLabels) {
+        actx.fillStyle = '#f8fafc';
+        actx.font = 'bold 11px ui-monospace, monospace';
+        actx.textAlign = 'center';
+        actx.fillText(`PEJAL (${getElement().symbol})`, cx, cy + 4);
+      }
+      drawBottomCaption(cx, cy + r + 16, 'Bola masif tidak terbagi', '#bfdbfe');
+    }
+
+    function renderThomson(dt) {
+      const { cx, cy } = atomView;
+      const el = getElement();
+      const r = getAtomRadius() * 0.92;
+
+      const posGrad = actx.createRadialGradient(cx - r * 0.25, cy - r * 0.25, r * 0.05, cx, cy, r);
+      posGrad.addColorStop(0, 'rgba(251, 146, 60, 0.35)');
+      posGrad.addColorStop(0.7, 'rgba(234, 88, 12, 0.18)');
+      posGrad.addColorStop(1, 'rgba(154, 52, 18, 0.08)');
+
+      actx.beginPath();
+      actx.arc(cx, cy, r, 0, Math.PI * 2);
+      actx.fillStyle = posGrad;
+      actx.fill();
+      actx.lineWidth = 2;
+      actx.strokeStyle = 'rgba(251, 146, 60, 0.65)';
+      actx.stroke();
+
+      state.thomsonElectrons.forEach((e) => {
+        e.phase += dt * 3.2;
+        const baseR = e.dist * r * 0.74;
+        const osc = Math.sin(e.phase) * 3.5;
+        drawElectron(cx + Math.cos(e.angle) * (baseR + osc), cy + Math.sin(e.angle) * (baseR + osc), 4.6, '#38bdf8');
+      });
+
+      drawBottomCaption(cx, cy + r + 16, `Bola Positif (+) & Elektron (-) — ${el.name}`, '#fdba74');
+    }
+
+    function renderRutherford(dt) {
+      const { cx, cy } = atomView;
+      const el = getElement();
+      const baseOrbitR = getAtomRadius();
+      drawNucleus(cx, cy, el.Z, 11);
+
+      state.rutherfordElectrons.forEach((elec) => {
+        elec.angle += elec.speed * dt;
+        const rx = baseOrbitR * elec.radiusScale;
+        const ry = rx * (0.36 + Math.abs(elec.tiltX) * 0.42);
+        const cosRot = Math.cos(elec.rotZ);
+        const sinRot = Math.sin(elec.rotZ);
+
+        if (state.showGuides) {
+          actx.save();
+          actx.translate(cx, cy);
+          actx.rotate(elec.rotZ);
+          actx.beginPath();
+          actx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+          actx.strokeStyle = 'rgba(56, 189, 248, 0.24)';
+          actx.lineWidth = 1.2;
+          actx.stroke();
+          actx.restore();
+        }
+
+        const localX = Math.cos(elec.angle) * rx;
+        const localY = Math.sin(elec.angle) * ry;
+        const ex = cx + localX * cosRot - localY * sinRot;
+        const ey = cy + localX * sinRot + localY * cosRot;
+
+        elec.trail.push({ x: ex, y: ey });
+        if (elec.trail.length > 10) elec.trail.shift();
+
+        for (let t = 1; t < elec.trail.length; t++) {
+          actx.strokeStyle = `rgba(34, 211, 238, ${(t / elec.trail.length) * 0.45})`;
+          actx.lineWidth = 2;
+          actx.beginPath();
+          actx.moveTo(elec.trail[t - 1].x, elec.trail[t - 1].y);
+          actx.lineTo(elec.trail[t].x, elec.trail[t].y);
+          actx.stroke();
+        }
+
+        drawElectron(ex, ey, 4.4, '#22d3ee');
+      });
+
+      drawBottomCaption(cx, cy + baseOrbitR + 16, 'Inti Padat (+) di Pusat • Ruang Kosong', '#cbd5e1');
+    }
+
+    function renderBohr(dt) {
+      const { cx, cy } = atomView;
+      const el = getElement();
+      const maxShell = Math.max(4, Math.min(5, el.shells.length + 1));
+      const outerR = getAtomRadius();
+      const innerR = Math.min(18, outerR * 0.22);
+      const stepR = (outerR - innerR) / maxShell;
+
+      if (state.showGuides) {
+        for (let n = 1; n <= maxShell; n++) {
+          const r = innerR + n * stepR;
+          const isTarget = state.activeShellHighlight === n;
+          actx.beginPath();
+          actx.arc(cx, cy, r, 0, Math.PI * 2);
+          actx.strokeStyle = isTarget ? 'rgba(52, 211, 153, 0.7)' : 'rgba(56, 189, 248, 0.34)';
+          actx.lineWidth = isTarget ? 2 : 1.3;
+          actx.stroke();
+
+          if (state.showLabels) {
+            actx.fillStyle = isTarget ? '#6ee7b7' : '#7dd3fc';
+            actx.font = '9px ui-monospace, monospace';
+            actx.textAlign = 'left';
+            actx.fillText(`n=${n}`, cx + r + 3, cy - 2);
+          }
+        }
+      }
+
+      drawNucleus(cx, cy, el.Z, 10);
+
+      state.bohrElectrons.forEach((elec) => {
+        elec.angle += elec.speed * dt;
+        if (elec.exciteTimer > 0) {
+          elec.exciteTimer -= dt;
+          if (elec.exciteTimer <= 0) {
+            elec.targetShell = elec.baseShell;
+          }
+        }
+        elec.currentShell += (elec.targetShell - elec.currentShell) * Math.min(1, dt * 7);
+        const r = innerR + elec.currentShell * stepR;
+        drawElectron(cx + Math.cos(elec.angle) * r, cy + Math.sin(elec.angle) * r, 4.5, elec.currentShell > elec.baseShell ? '#34d399' : '#38bdf8');
+      });
+
+      drawPhotons(dt);
+      drawBottomCaption(cx, cy + outerR + 16, `Transisi n=${state.nFrom} → n=${state.nTo} • ${el.symbol}`, '#bae6fd');
+    }
+
+    function renderQuantum() {
+      const { cx, cy } = atomView;
+      const el = getElement();
+      const maxR = getAtomRadius();
+      const rotY = state.time * 0.65;
+      const rotX = 0.36;
+
+      if (state.showGuides) {
+        actx.save();
+        actx.strokeStyle = 'rgba(148, 163, 184, 0.25)';
+        actx.lineWidth = 1;
+        actx.beginPath();
+        actx.moveTo(cx - maxR * 1.06, cy);
+        actx.lineTo(cx + maxR * 1.06, cy);
+        actx.moveTo(cx, cy - maxR * 1.06);
+        actx.lineTo(cx, cy + maxR * 1.06);
+        actx.stroke();
+
+        if (state.showLabels) {
+          actx.fillStyle = 'rgba(203, 213, 225, 0.65)';
+          actx.font = '9px ui-monospace, monospace';
+          actx.textAlign = 'left';
+          actx.fillText('x', cx + maxR * 1.04, cy - 3);
+          actx.fillText('y', cx + 4, cy - maxR * 1.01);
+        }
+        actx.restore();
+      }
+
+      const cosY = Math.cos(rotY);
+      const sinY = Math.sin(rotY);
+      const cosX = Math.cos(rotX);
+      const sinX = Math.sin(rotX);
+
+      state.orbitalCloud.forEach((pt) => {
+        const x1 = pt.x0 * cosY + pt.z0 * sinY;
+        const z1 = -pt.x0 * sinY + pt.z0 * cosY;
+        const y2 = pt.y0 * cosX - z1 * sinX;
+        const z2 = pt.y0 * sinX + z1 * cosX;
+
+        const px = cx + x1 * maxR;
+        const py = cy + y2 * maxR;
+        const depth = 0.72 + ((z2 + 1) * 0.5) * 0.36;
+
+        let boost = 1;
+        if (state.pointer.active) {
+          const d = Math.hypot(px - state.pointer.x, py - state.pointer.y);
+          if (d < 55) boost = 1 + (1 - d / 55) * 0.75;
+        }
+
+        const alpha = Math.min(0.95, (0.25 + pt.weight * 0.52) * depth * boost);
+        actx.beginPath();
+        actx.arc(px, py, pt.size * depth, 0, Math.PI * 2);
+        actx.fillStyle = pt.sign >= 0
+          ? `rgba(192, 132, 252, ${alpha})`
+          : `rgba(34, 211, 238, ${alpha})`;
+        actx.fill();
+      });
+
+      drawNucleus(cx, cy, el.Z, 9);
+      drawPhotons(0.016);
+
+      const orbDesc = ORBITAL_INFO[state.orbital]?.name || 'Orbital s';
+      drawBottomCaption(cx, cy + maxR + 16, `${orbDesc} • |ψ|² (${el.symbol})`, '#e9d5ff');
+    }
+
+    let lastTimestamp = performance.now();
+
+    function loop(now) {
+      const rawDt = Math.min(0.05, (now - lastTimestamp) / 1000);
+      lastTimestamp = now;
+
+      const dt = state.paused ? 0 : rawDt * state.speed;
+      state.time += dt;
+
+      const { w, h, cx, cy } = atomView;
+      if (w > 0 && h > 0) {
+        actx.clearRect(0, 0, w, h);
+
+        const bgGlow = actx.createRadialGradient(cx, cy, 8, cx, cy, Math.max(w, h) * 0.55);
+        bgGlow.addColorStop(0, 'rgba(30, 58, 138, 0.15)');
+        bgGlow.addColorStop(1, 'rgba(5, 8, 17, 0)');
+        actx.fillStyle = bgGlow;
+        actx.fillRect(0, 0, w, h);
+
+        switch (state.theory) {
+          case 'dalton': renderDalton(); break;
+          case 'thomson': renderThomson(dt); break;
+          case 'rutherford': renderRutherford(dt); break;
+          case 'alpha_scattering': renderAlphaScattering(dt); break;
+          case 'bohr': renderBohr(dt); break;
+          case 'quantum': renderQuantum(); break;
+        }
+
+        if (state.theory !== 'quantum' && state.theory !== 'alpha_scattering') {
+          drawPhotons(dt);
+        }
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', applyMobileView);
+    initEntities();
+    syncUI();
+    applyMobileView();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
